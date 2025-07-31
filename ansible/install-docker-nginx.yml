@@ -1,0 +1,35 @@
+- name: Install and configure Nginx on Ubuntu
+  hosts: webserver
+  become: true
+  tasks:
+    - name: Update apt packages
+      ansible.builtin.apt:
+        update_cache: true
+
+    - name: Install required packages
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    - name: Install docker
+      ansible.builtin.apt:
+        name: docker.io
+        state: present
+
+    - name: Enable and start docker service
+      ansible.builtin.systemd:
+        name: docker
+        enabled: true
+        state: started
+
+    - name: Run Nginx container
+      community.docker.docker_container:
+        name: nginx
+        image: nginx:latest
+        state: started
+        published_ports:
+          - "80:80"

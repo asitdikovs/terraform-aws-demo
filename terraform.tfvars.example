@@ -1,3 +1,3 @@
-bucket_name     = "asit-terraform-demo-bucket-12345" # Must be globally unique
-public_key_path = "~/.ssh/devops-key.pub"
+bucket_name     = "bucket name" # Must be globally unique
+public_key_path = "path to key"
 instance_type   = "t3.micro"

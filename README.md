@@ -1,11 +1,9 @@
-# Terraform AWS Demo – EC2 with Docker and Nginx
+# Terraform + Ansible AWS Demo – EC2 with Docker and Nginx
 
-This Terraform project demonstrates how to provision basic AWS infrastructure:
+This project demonstrates a **complete Infrastructure as Code (IaC) workflow** using:
 
-- An S3 bucket
-- A security group allowing SSH and HTTP access
-- An EC2 instance running Ubuntu 22.04
-- Automatic installation of Docker and deployment of an Nginx container on instance boot
+- **Terraform** – to provision AWS resources (EC2, Security Group, S3 bucket, SSH access)
+- **Ansible** – to configure the EC2 instance (install Docker and deploy an Nginx container)
 
 ---
 
@@ -13,6 +11,13 @@ This Terraform project demonstrates how to provision basic AWS infrastructure:
 
 - AWS CLI installed and configured (`aws configure`)
 - Terraform v1.x installed
+- Ansible installed
+- Community Docker collection installed
+
+```bash
+ ansible-galaxy collection install community.docker
+```
+
 - A valid AWS account with permissions to create EC2, S3, and networking resources
 - An existing SSH key pair on your local machine (e.g., `~/.ssh/devops-key.pub`)
 
@@ -27,14 +32,18 @@ This Terraform project demonstrates how to provision basic AWS infrastructure:
    ```
 2. ### Copy and edit variables file
 
+   ```bash
    cp terraform.tfvars.example terraform.tfvars
+   ```
 
-   #Edit terraform.tfvars and set:
-   #bucket_name = "your-unique-bucket-name"
-   #public_key_path = "/absolute/path/to/your-key.pub"
-   #instance_type = "t3.micro"
+   ```bash
+   # Edit terraform.tfvars and set:
+   # bucket_name = "your-unique-bucket-name"
+   # public_key_path = "/absolute/path/to/your-key.pub"
+   # instance_type = "t3.micro"
+   ```
 
-3. ### Initialize Terraform
+3. ### Deploy infrastructure
 
    ```bash
    terraform init
@@ -43,23 +52,35 @@ This Terraform project demonstrates how to provision basic AWS infrastructure:
    Plan and apply changes
 
    ```bash
-   terraform plan
    terraform apply -auto-approve
    ```
 
-4. ### Get EC2 public IP
+4. ### Configure server with Ansible
 
    ```bash
-   terraform output ec2_public_ip
+   ansible-playbook -i ansible/inventory.ini ansible/install-docker-nginx.yml
    ```
 
 5. ### Connect to the EC2 instance via SSH
+
    ```bash
    ssh -i /path/to/private-key.pem ubuntu@<EC2_PUBLIC_IP>
    ```
-   Or access the Nginx server from your browser:
+
+   To get public IP of EC2, type:
+
+   ```bash
+   terraform output -raw ec2_public_ip
+   ```
+
+6. ### Test Nginx
+   Access the Nginx server from your browser:
    ```bash
    http://<EC2_PUBLIC_IP>
+   ```
+   or from CLI:
+   ```bash
+   curl http://$(terraform output -raw ec2_public_ip)
    ```
 
 ## Cleanup

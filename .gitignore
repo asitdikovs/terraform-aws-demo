@@ -2,3 +2,6 @@
 *.tfstate
 *.tfstate.backup
 terraform.tfvars
+ansible/inventory.ini
+.ansible-lint
+.ansible/

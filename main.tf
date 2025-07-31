@@ -76,30 +76,17 @@ resource "aws_instance" "demo_instance" {
   key_name               = aws_key_pair.devops_key.key_name
   vpc_security_group_ids = [aws_security_group.demo_sg.id]
 
-  # run commands on first boot
-  user_data = <<-EOF
-              #!/bin/bash
-              exec > /var/log/user-data.log 2>&1
-              set -x 
-
-              # run updates
-              sudo apt-get update -y
-              sudo apt-get upgrade -y
-              
-              # install docker
-              sudo apt-get install -y docker.io
-
-              # enable and start docker 
-              sudo systemctl enable docker
-              sudo systemctl start docker
-
-              # run simple container with NGINX web server 
-              sudo docker run -d -p 80:80 --name nginx-demo-server nginx:latest
-              EOF
-
   tags = {
     Name = "demo-ubuntu-docker-nginx"
   }
 
   depends_on = [aws_key_pair.devops_key]
+}
+
+resource "local_file" "ansible_inventory" {
+  filename = "${path.module}/ansible/inventory.ini"
+  content  = <<EOT
+  [webserver]
+    ${aws_instance.demo_instance.public_ip} ansible_ssh_private_key_file=~/.ssh/devops-key ansible_user=ubuntu
+  EOT
 }
