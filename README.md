@@ -20,26 +20,21 @@ This Terraform project demonstrates how to provision basic AWS infrastructure:
 
 ## Usage
 
-1. **Clone the repository**
+1. ### **Clone the repository**
    ```bash
    git clone https://github.com/asitdikovs/terraform-aws-demo.git
    cd terraform-aws-demo
    ```
-2. Edit main.tf
+2. ### Copy and edit variables file
 
-   Set a globally unique S3 bucket name:
+   cp terraform.tfvars.example terraform.tfvars
 
-   ```bash
-   bucket = "your-unique-bucket-name"
-   ```
+   #Edit terraform.tfvars and set:
+   #bucket_name = "your-unique-bucket-name"
+   #public_key_path = "/absolute/path/to/your-key.pub"
+   #instance_type = "t3.micro"
 
-   Set the path to your public SSH key file:
-
-   ```bash
-   public_key = file("/absolute/path/to/your-key.pub")
-   ```
-
-3. Initialize Terraform
+3. ### Initialize Terraform
 
    ```bash
    terraform init
@@ -49,12 +44,16 @@ This Terraform project demonstrates how to provision basic AWS infrastructure:
 
    ```bash
    terraform plan
-   terraform apply
+   terraform apply -auto-approve
    ```
 
-   Type yes when prompted.
+4. ### Get EC2 public IP
 
-4. Connect to the EC2 instance
+   ```bash
+   terraform output ec2_public_ip
+   ```
+
+5. ### Connect to the EC2 instance via SSH
    ```bash
    ssh -i /path/to/private-key.pem ubuntu@<EC2_PUBLIC_IP>
    ```

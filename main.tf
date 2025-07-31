@@ -18,7 +18,7 @@ data "aws_vpc" "default" {
 
 # Create S3 Bucket
 resource "aws_s3_bucket" "demo_bucket" {
-  bucket = "bucket" # Replace with your unique bucket name
+  bucket = var.bucket_name
   tags = {
     Name        = "DemoBucket"
     Environment = "Dev"
@@ -62,17 +62,17 @@ resource "aws_security_group" "demo_sg" {
 }
 
 
-# Import local SSH public key
+# SSH key 
 resource "aws_key_pair" "devops_key" {
   key_name   = "devops-key"
-  public_key = file("/") # Replace with your public key path
+  public_key = file(var.public_key_path) # Replace with your public key path
 }
 
 
 # EC2 Instance
 resource "aws_instance" "demo_instance" {
   ami                    = "ami-0a7d80731ae1b2435" # Ubuntu 22.04 LTS (us-east-1)
-  instance_type          = "t3.micro"
+  instance_type          = var.instance_type
   key_name               = aws_key_pair.devops_key.key_name
   vpc_security_group_ids = [aws_security_group.demo_sg.id]
 
