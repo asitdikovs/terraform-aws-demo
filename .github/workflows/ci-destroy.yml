@@ -23,7 +23,3 @@ jobs:
       - name: Terraform Destroy
         run: terraform destroy -auto-approve
           -var "public_key_content=${{ secrets.EC2_PUBLIC_KEY }}"
-      - name: Download Terraform State
-        uses: actions/download-artifact@v4
-        with:
-          name: terraform-state

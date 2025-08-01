@@ -53,11 +53,3 @@ jobs:
           echo "${EC2_IP}" > inventory.txt
           ansible-playbook -i inventory.txt, ansible/playbook.yml \
             --private-key id_rsa -u ubuntu
-
-      - name: Upload Terraform State
-        uses: actions/upload-artifact@v4
-        with:
-          name: terraform-state
-          path: |
-            terraform.tfstate
-            terraform.tfstate.backup 
