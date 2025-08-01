@@ -91,3 +91,11 @@ resource "local_file" "ansible_inventory" {
   EOT
 }
 
+terraform {
+  backend "s3" {
+    bucket = "my-devops-demo-terraform-state"
+    key    = "terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
