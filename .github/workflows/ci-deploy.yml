@@ -51,5 +51,5 @@ jobs:
       - name: Run Ansible Playbook
         run: |
           echo "${EC2_IP}" > inventory.txt
-          ansible-playbook -i inventory.txt, playbook.yml \
+          ansible-playbook -i inventory.txt, ansible/playbook.yml \
             --private-key id_rsa -u ubuntu
