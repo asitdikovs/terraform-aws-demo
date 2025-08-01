@@ -25,6 +25,7 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+          -var "public_key_content=${{ secrets.EC2_PUBLIC_KEY }}"
 
       # Extract EC2 IP
       - name: Get EC2 Public IP
