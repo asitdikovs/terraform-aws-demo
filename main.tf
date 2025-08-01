@@ -65,7 +65,7 @@ resource "aws_security_group" "demo_sg" {
 # SSH key 
 resource "aws_key_pair" "devops_key" {
   key_name   = "devops-key"
-  public_key = file(var.public_key_content) # Replace with your public key path
+  public_key = var.public_key_content
 }
 
 
