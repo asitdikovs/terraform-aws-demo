@@ -90,3 +90,4 @@ resource "local_file" "ansible_inventory" {
     ${aws_instance.demo_instance.public_ip} ansible_ssh_private_key_file=~/.ssh/devops-key ansible_user=ubuntu
   EOT
 }
+

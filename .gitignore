@@ -6,3 +6,5 @@ ansible/inventory.ini
 .ansible-lint
 .ansible/
 .vscode/
+github-actions-key
+github-actions-key.pub
