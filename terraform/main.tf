@@ -16,15 +16,65 @@ data "aws_vpc" "default" {
   default = true
 }
 
-# Create S3 Bucket
-resource "aws_s3_bucket" "demo_bucket" {
-  bucket = var.bucket_name
-  tags = {
-    Name        = "DemoBucket"
-    Environment = "Dev"
+# Create S3 Bucket for Terraform state
+resource "aws_s3_bucket" "terraform_state" {
+  bucket = "bucket-name" # Update bucket name 
+
+  lifecycle {
+    prevent_destroy = false
   }
 }
 
+resource "aws_s3_bucket_versioning" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# Hardening S3 bucket's security 
+resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+
+  block_public_acls       = true
+  ignore_public_acls      = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+}
+
+# DynamoDB for Terraform state
+resource "aws_dynamodb_table" "terraform_state" {
+  name         = "terraform-state"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key = "LockID"
+
+  attribute {
+    name = "LockID"
+    type = "S"
+  }
+}
+
+# Backend S3 for Terraform
+terraform {
+  backend "s3" {
+    bucket         = "bucket-name" # Update this name
+    key            = "folder_path/terraform.tfstate" # Provide correct path in S3
+    region         = "us-east-1"
+    dynamodb_table = "terraform-state"
+    encrypt        = true
+  }
+}
 
 # Security Group for SSH and HTTP 
 resource "aws_security_group" "demo_sg" {
@@ -65,14 +115,14 @@ resource "aws_security_group" "demo_sg" {
 # SSH key 
 resource "aws_key_pair" "devops_key" {
   key_name   = "devops-key"
-  public_key = var.public_key_content
+  public_key = file("path") # Provide path to public key
 }
 
 
 # EC2 Instance
 resource "aws_instance" "demo_instance" {
   ami                    = "ami-0a7d80731ae1b2435" # Ubuntu 22.04 LTS (us-east-1)
-  instance_type          = var.instance_type
+  instance_type          = "t3.micro"
   key_name               = aws_key_pair.devops_key.key_name
   vpc_security_group_ids = [aws_security_group.demo_sg.id]
 
@@ -91,10 +141,3 @@ resource "local_file" "ansible_inventory" {
   EOT
 }
 
-terraform {
-  backend "s3" {
-    bucket = "my-devops-demo-terraform-state"
-    key    = "terraform.tfstate"
-    region = "us-east-1"
-  }
-}
