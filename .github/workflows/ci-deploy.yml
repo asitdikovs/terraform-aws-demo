@@ -23,11 +23,13 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
+        working-directory: terraform/
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
           -var "public_key_content=${{ secrets.EC2_SSH_KEY }}"
-
+        working-directory: terraform/
+        
       # Extract EC2 IP
       - name: Get EC2 Public IP
         id: tf_output
