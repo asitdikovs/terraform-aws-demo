@@ -21,9 +21,6 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Clean Terraform directories
-        run: rm -rf .terraform .terraform.lock.hcl
-        
       - name: Terraform Init
         run: terraform init
 
